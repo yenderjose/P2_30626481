@@ -42,15 +42,20 @@ class ContactosController {
 
     const response_key = req.body["g-recaptcha-response"];
     const secret_key = process.env.RECAPTCHAPRIVATE;
-    const url =
-      `https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${response_key}`;
+    const url =`https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${response_key}`;
+
+    const urlPais = 'http://ipwho.is/' + ip
+    const urlPaisFetch = await fetch(urlPais)
+    const jsonUrlPais = await urlPaisFetch.json();
+    const pais = jsonUrlPais.country;
+
 
     fetch(url, {
       method: "post",
     })
       .then((response) => response.json())
       .then((google_response) => {
-
+        console.log(google_response)
         if (google_response.success == true) {
 
 
