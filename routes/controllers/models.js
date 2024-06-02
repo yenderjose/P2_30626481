@@ -63,16 +63,16 @@ class ContactosController {
 
 
           // Create a transporter object
-          const transporter = nodemailer.createTransport({
-            host: "smtp.hostinger.com",
-            port: 465,
-            secureConnection: false, // use SSL
-            auth: {
-              user: process.env.CORREO,
-              pass: process.env.CONTRASENA,
-            },
-            debug: true
-          });
+          let transporter = nodemailer.createTransport({
+        host: "smtp.hostinger.com",
+        port: 465,
+        secureConnection: false,
+        auth: {
+          user: process.env.CORREO,
+          pass: process.env.CONTRASENA
+        },
+        debug: true
+      });
 
           // Configure the mailoptions object
           const mailOptions = {
