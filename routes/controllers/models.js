@@ -64,13 +64,14 @@ class ContactosController {
 
           // Create a transporter object
           const transporter = nodemailer.createTransport({
-            host: 'smtp.hostinger.com',
+            host: "smtp.hostinger.com",
             port: 465,
             secureConnection: false, // use SSL
             auth: {
               user: process.env.CORREO,
               pass: process.env.CONTRASENA,
-            }
+            },
+            debug: true
           });
 
           // Configure the mailoptions object
@@ -78,7 +79,7 @@ class ContactosController {
             from: process.env.CORREO,
             to: 'programacion2ais@dispostable.com',
             subject: 'Contact information',
-            text: `
+            html: `
                    <h1>Welcome!</h1>
                    <p>Nombre: ${firstname}</p>
                    <p>Correo: ${lastname}</p>
