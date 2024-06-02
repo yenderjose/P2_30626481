@@ -42,69 +42,56 @@ class ContactosController {
 
     const response_key = req.body["g-recaptcha-response"];
     const secret_key = process.env.RECAPTCHAPRIVATE;
-    const url =`https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${response_key}`;
+    const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${response_key}`;
 
     const urlPais = 'http://ipwho.is/' + ip
     const urlPaisFetch = await fetch(urlPais)
     const jsonUrlPais = await urlPaisFetch.json();
     const pais = jsonUrlPais.country;
 
+    const urlKey = `https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${response_key}`;
+    const recaptchaKey = await fetch(urlKey, { method: "post", });
+    const google_data = await recaptchaKey.json();
+    if (google_data.success == true) {
 
-    fetch(url, {
-      method: "post",
-    })
-      .then((response) => response.json())
-      .then((google_response) => {
-        console.log(google_response)
-        if (google_response.success == true) {
-
-
-          // Import the Nodemailer library
-
-
-          // Create a transporter object
-          let transporter = nodemailer.createTransport({
-        host: "smtp.hostinger.com",
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.hostinger.com',
         port: 465,
-        secureConnection: false,
+        secureConnection: false, // use SSL
         auth: {
           user: process.env.CORREO,
-          pass: process.env.CONTRASENA
-        },
-        debug: true
-      });
-
-          // Configure the mailoptions object
-          const mailOptions = {
-            from: process.env.CORREO,
-            to: 'programacion2ais@dispostable.com',
-            subject: 'Contact information',
-            html: `
-                   <h1>Welcome!</h1>
-                   <p>Nombre: ${firstname}</p>
-                   <p>Correo: ${lastname}</p>
-                   <p>Fecha/Hora: ${fecha}</p>
-                   <p>Pais: ${pais}</p>
-                   <p>Ip: ${ip}</p>`
-          };
-
-          // Send the email
-          transporter.sendMail(mailOptions, function (error, info) {
-            if (error) {
-              console.log(error);
-            } else {
-              this.model.guardar(firstname, lastname, subject, ip, fecha, pais);
-              return res.send({ response: "Contact save and email successfully" });
-            }
-          });
-        } else {
-          return res.send({ response: "Failed captcha" });
+          pass: process.env.CONTRASENA,
         }
-      })
-      .catch((error) => {
-        // Some error while verify captcha
-        return res.json({ error });
       });
+
+      // Configure the mailoptions object
+      const mailOptions = {
+        from: process.env.CORREO,
+        to: 'programacion2ais@dispostable.com',
+        subject: 'Contact information',
+        html: `
+               <h1>Welcome!</h1>
+               <p>Nombre: ${firstname}</p>
+               <p>Correo: ${lastname}</p>
+               <p>Fecha/Hora: ${fecha}</p>
+               <p>Pais: ${pais}</p>
+               <p>Ip: ${ip}</p>`
+      };
+
+      // Send the email
+      transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(info)
+          this.model.guardar(firstname, lastname, subject, ip, fecha, pais);
+          return res.send({ response: "Contact save and email successfully" });
+        }
+      });
+    }else{
+      res.send({response:'Error in captcha'})
+    }
+
 
 
 
