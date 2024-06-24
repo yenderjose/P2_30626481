@@ -22,23 +22,23 @@
           </tr>
         </thead>
         <tbody>
-            <% for (const data of data) { %>
+            <% for (const i of data) { %>
                 <tr>
                     <td>
-                        <%= data.name%>
+                        <%= i.name%>
                     </td>
                     <td>
-                        <%= data.email%>
+                        <%= i.email%>
                     </td>
                     <td>
-                        <%= data.commentary%>
+                        <%= i.commentary%>
                     </td>
 
                     <td>
-                        <%= data.ip%>
+                        <%= i.ip%>
                     </td>
                     <td>
-                        <%= data.country%>
+                        <%= i.country%>
                     </td>
                 </tr>
                 <% } %>
