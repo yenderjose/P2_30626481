@@ -4,8 +4,6 @@ const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 
-
-
 class ContactosModel {
   constructor() {
     this.db = new sqlite3.Database(path.join(__dirname, "/database", "database.db"), (err) => {
@@ -24,6 +22,13 @@ class ContactosModel {
     this.db.run("INSERT INTO contactos VALUES (?, ?, ?, ?, ?, ?)", [nombre, correo, comentario, ip, fecha, pais]);
   }
 
+  getContacts(){
+    return new Promise((resolve, reject) => {
+      this.db.all("SELECT * FROM contactos",[],(err, rows) => {
+        rows ? resolve(rows):reject(err)
+      })
+    })
+  }
 }
 
 
@@ -34,7 +39,7 @@ class ContactosController {
   }
 
   async save(req, res) {
-    const { email, password, subject } = req.body;
+    const { name, email, commentary } = req.body;
     const ip = req.headers['x-forwarded-for']?.split(',').shift() || req.socket?.remoteAddress;
     let hoy = new Date();
     let horas = hoy.getHours();
@@ -42,8 +47,6 @@ class ContactosController {
 
     const response_key = req.body["g-recaptcha-response"];
     const secret_key = process.env.RECAPTCHAPRIVATE;
-    const url = `https://www.google.com/recaptcha/api/siteverify?secret=${secret_key}&response=${response_key}`;
-
     const urlPais = 'http://ipwho.is/' + ip
     const urlPaisFetch = await fetch(urlPais)
     const jsonUrlPais = await urlPaisFetch.json();
@@ -71,8 +74,8 @@ class ContactosController {
         subject: 'Contact information',
         html: `
                <h1>Welcome!</h1>
-               <p>Nombre: ${email}</p>
-               <p>Correo: ${password}</p>
+               <p>Nombre: ${name}</p>
+               <p>Correo: ${email}</p>
                <p>Fecha/Hora: ${fecha}</p>
                <p>Pais: ${pais}</p>
                <p>Ip: ${ip}</p>`
@@ -84,12 +87,12 @@ class ContactosController {
           console.log(err);
         } else {
           console.log(info)
-          this.model.guardar(email, password, subject, ip, fecha, pais);
+          this.model.guardar(name, email, commentary, ip, fecha, pais);
           return res.send({ response: "Contact save and email successfully" });
         }
       });
-    }else{
-      res.send({response:'Error in captcha'})
+    } else {
+      res.send({ response: 'Error in captcha' })
     }
 
 
